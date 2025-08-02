@@ -1,37 +1,62 @@
-// bot.js const mineflayer = require('mineflayer'); const express = require('express'); const bodyParser = require('body-parser'); const { Telegraf } = require('telegraf'); require('dotenv').config();
+import mineflayer from 'mineflayer';
+import { pathfinder } from 'mineflayer-pathfinder';
+import autoeat from 'mineflayer-auto-eat';
+import repl from 'repl';
 
-const app = express(); app.use(bodyParser.json());
+function createBot() {
+  const bot = mineflayer.createBot({
+    host: 'mcfleet.net',
+    port: 25565,
+    username: 'GOD_GAMERZ_XD',
+    version: '1.20.1',
+    auth: 'offline',
+  });
 
-const bot = new Telegraf(process.env.BOT_TOKEN);
+  bot.loadPlugin(pathfinder);
+  bot.loadPlugin(autoeat);
 
-let mcBot;
+  bot.once('spawn', () => {
+    console.log('Bot spawned in the server.');
 
-function createBot() { mcBot = mineflayer.createBot({ host: 'mcfleet.net', port: 25565, username: 'GOD_GAMERZ_XD', version: '1.20.1', auth: 'offline', });
+    bot.chat('/login GODGAMERZ9998');
 
-mcBot.on('login', () => { console.log('Minecraft bot logged in'); setTimeout(() => mcBot.chat('/login GODGAMERZ9998'), 5000); setTimeout(() => mcBot.chat('/joinq survival-2'), 10000); setTimeout(() => mcBot.chat('/warp AfkZone'), 15000); });
+    setTimeout(() => {
+      bot.chat('/joinq survival-2');
+    }, 3000);
 
-mcBot.on('end', () => { console.log('Minecraft bot disconnected. Reconnecting...'); setTimeout(createBot, 10000); });
+    setTimeout(() => {
+      bot.chat('/warp AfkZone');
+    }, 6000);
 
-setInterval(() => { if (mcBot && mcBot.entity) { mcBot.setControlState('jump', true); setTimeout(() => mcBot.setControlState('jump', false), 500); } }, 30000);
+    setInterval(() => {
+      bot.setControlState('jump', true);
+      setTimeout(() => bot.setControlState('jump', false), 500);
+    }, 10000);
+  });
 
-mcBot.on('chat', (username, message) => { if (username === mcBot.username) return; if (message.toLowerCase() === 'hi') mcBot.chat('hlo'); }); }
+  bot.on('chat', (username, message) => {
+    if (username === bot.username) return;
+    if (message.toLowerCase() === 'hi') {
+      bot.chat('hlo');
+    }
+  });
+
+  bot.on('end', () => {
+    console.log('Bot disconnected, reconnecting in 10s...');
+    setTimeout(createBot, 10000);
+  });
+
+  bot.on('error', (err) => {
+    console.error('Bot error:', err.message);
+  });
+
+  repl.start({ prompt: '> ', eval: (cmd, context, filename, callback) => {
+    try {
+      callback(null, eval(cmd));
+    } catch (e) {
+      callback(e);
+    }
+  }});
+}
 
 createBot();
-
-bot.command('status', (ctx) => { ctx.reply(mcBot ? 'Bot is running.' : 'Bot is offline.'); });
-
-bot.command('say', (ctx) => { const msg = ctx.message.text.split(' ').slice(1).join(' '); if (mcBot) mcBot.chat(msg); ctx.reply('Sent message in Minecraft.'); });
-
-bot.command('jump', (ctx) => { if (mcBot) { mcBot.setControlState('jump', true); setTimeout(() => mcBot.setControlState('jump', false), 500); ctx.reply('Bot jumped!'); } });
-
-bot.command('stop', (ctx) => { if (mcBot) { mcBot.quit(); ctx.reply('Bot stopped.'); } });
-
-app.use(bot.webhookCallback('/telegram'));
-
-const PORT = process.env.PORT || 3000; app.listen(PORT, () => { console.log(Server running on port ${PORT}); bot.telegram.setWebhook(${process.env.WEBHOOK_URL}/telegram); });
-
-
-telegram.onText(/\/stop/, (msg) => {
-  bot.quit()
-  telegram.sendMessage(msg.chat.id, 'Bot has been stopped.')
-})

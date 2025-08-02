@@ -1,98 +1,61 @@
 const mineflayer = require('mineflayer');
-const { pathfinder } = require('mineflayer-pathfinder');
 const TelegramBot = require('node-telegram-bot-api');
 
-function createBot() {
+function startBot() {
   const bot = mineflayer.createBot({
     host: 'mcfleet.net',
     port: 25565,
     username: 'GOD_GAMERZ_XD',
-    version: '1.20.1',
+    version: '1.20.1'
   });
 
-  bot.loadPlugin(pathfinder);
-
   bot.on('login', () => {
-    console.log('✅ Minecraft bot logged in!');
+    console.log('✅ Logged in to Minecraft');
     bot.chat('/login GODGAMERZ9998');
   });
 
-  bot.once('spawn', () => {
-    bot.chat('/joinq survival-2');
+  bot.on('spawn', () => {
+    setTimeout(() => {
+      bot.chat('/joinq survival-2');
+    }, 3000);
     setTimeout(() => {
       bot.chat('/warp AfkZone');
-    }, 5000);
+    }, 7000);
   });
 
-  const tgBot = new TelegramBot('8015321777:AAFbGRO25iV4Vv_89BrLFfHlzUogn9-6kv0', { polling: true });
+  const telegram = new TelegramBot('8015321777:AAFbGRO25iV4Vv_89BrLFfHlzUogn9-6kv0', { polling: true });
 
-  tgBot.onText(/\/status/, (msg) => {
-    tgBot.sendMessage(msg.chat.id, '✅ Bot is running.');
+  telegram.onText(/\/status/, (msg) => {
+    telegram.sendMessage(msg.chat.id, '✅ Bot is online and connected.');
   });
 
-  tgBot.onText(/\/say (.+)/, (msg, match) => {
+  telegram.onText(/\/say (.+)/, (msg, match) => {
     const text = match[1];
     bot.chat(text);
-    tgBot.sendMessage(msg.chat.id, `💬 Sent to Minecraft: ${text}`);
+    telegram.sendMessage(msg.chat.id, `💬 Sent to Minecraft: ${text}`);
   });
 
-  tgBot.onText(/\/stop/, (msg) => {
-    tgBot.sendMessage(msg.chat.id, '🛑 Stopping bot...');
+  telegram.onText(/\/stop/, (msg) => {
+    telegram.sendMessage(msg.chat.id, '🛑 Stopping bot...');
     process.exit();
   });
 
+  bot.on('chat', (username, message) => {
+    if (username !== bot.username) {
+      if (message.toLowerCase() === 'hi') {
+        bot.chat('hlo');
+      }
+    }
+  });
+
   bot.on('end', () => {
-    console.log('🔁 Bot disconnected. Reconnecting...');
-    setTimeout(createBot, 5000);
+    console.log('🔁 Bot disconnected. Reconnecting in 5s...');
+    setTimeout(startBot, 5000);
   });
 
   bot.on('error', (err) => {
-    console.error('❌ Error:', err.message);
+    console.error('❌ Bot Error:', err.message);
   });
 }
 
-createBot();  } else {
-    ctx.reply('❌ Bot is not connected.');
-  }
-});
-
-telegramBot.command('stop', ctx => {
-  if (mcBot) {
-    mcBot.quit();
-    ctx.reply('🛑 Bot stopped.');
-  }
-});
-
-createBot();
-telegramBot.launch().then(() => {
-  console.log('🚀 Telegram bot launched');
-});const telegram = new TelegramBot(telegramToken, { polling: true });
-
-telegram.onText(/\/status/, (msg) => {
-  telegram.sendMessage(msg.chat.id, '🤖 Bot is running and connected.');
-});
-
-telegram.onText(/\/say (.+)/, (msg, match) => {
-  const message = match[1];
-  if (bot && bot.chat) {
-    bot.chat(message);
-    telegram.sendMessage(msg.chat.id, `✅ Sent to Minecraft: ${message}`);
-  }
-});
-
-telegram.onText(/\/jump/, (msg) => {
-  if (bot && bot.entity) {
-    bot.setControlState('jump', true);
-    setTimeout(() => bot.setControlState('jump', false), 300);
-    telegram.sendMessage(msg.chat.id, '⏫ Jumped!');
-  }
-});
-
-telegram.onText(/\/stop/, (msg) => {
-  if (bot) {
-    bot.quit('Stopped by Telegram');
-    telegram.sendMessage(msg.chat.id, '⛔ Bot stopped.');
-  }
-});
-
-createBot();
+startBot();

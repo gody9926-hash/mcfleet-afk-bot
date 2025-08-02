@@ -3,5 +3,11 @@
   "version": "1.0.0",
   "engines": {
     "node": "18.x"
+  },
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "mineflayer": "^5.1.0"
   }
 }

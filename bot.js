@@ -1,40 +1,91 @@
-import mineflayer from 'mineflayer';
-import { pathfinder, Movements, goals } from 'mineflayer-pathfinder';
-import { Vec3 } from 'vec3';
-import TelegramBot from 'node-telegram-bot-api';
+import mineflayer from 'mineflayer'
+import { pathfinder } from 'mineflayer-pathfinder'
+import TelegramBot from 'node-telegram-bot-api'
+import readline from 'readline'
 
-const botUsername = 'GOD_GAMERZ_XD';
-const host = 'mcfleet.net';
-const version = '1.21.4';
-const telegramToken = '8015321777:AAFbGRO25iV4Vv_89BrLFfHlzUogn9-6kv0';
-const mcPassword = 'GODGAMERZ9998';
+// Replace with your bot token
+const TELEGRAM_TOKEN = '8015321777:AAFbGRO25iV4Vv_89BrLFfHlzUogn9-6kv0'
+const CHAT_ID = 'your-telegram-chat-id' // Set this after first run from logs
 
-let mcBot;
-let reconnecting = false;
+let bot, telegramBot
+let shouldReconnect = true
+let jumpInterval
 
-function createBot() {
-  mcBot = mineflayer.createBot({
-    host,
-    username: botUsername,
-    version,
+function startBot() {
+  bot = mineflayer.createBot({
+    host: 'mcfleet.net',
     port: 25565,
-    auth: 'offline'
-  });
+    username: 'GOD_GAMERZ_XD',
+    version: '1.21.4',
+    auth: 'offline',
+  })
 
-  mcBot.loadPlugin(pathfinder);
+  bot.loadPlugin(pathfinder)
 
-  mcBot.once('spawn', () => {
-    console.log('✅ Minecraft bot spawned.');
+  bot.once('spawn', () => {
+    console.log('Bot spawned')
 
-    mcBot.chat(`/login ${mcPassword}`);
-    setTimeout(() => mcBot.chat('/joinq survival-2'), 3000);
-    setTimeout(() => mcBot.chat('/warp AfkZone'), 6000);
+    bot.chat('/login GODGAMERZ9998')
+    setTimeout(() => bot.chat('/joinq survival-2'), 3000)
+    setTimeout(() => bot.chat('/warp AfkZone'), 6000)
 
-    // Auto jump loop
-    setInterval(() => {
-      if (mcBot.entity && mcBot.entity.onGround) {
-        mcBot.setControlState('jump', true);
-        setTimeout(() => mcBot.setControlState('jump', false), 300);
+    // Auto-jump
+    jumpInterval = setInterval(() => {
+      if (bot.entity && bot.entity.onGround) {
+        bot.setControlState('jump', true)
+        setTimeout(() => bot.setControlState('jump', false), 200)
+      }
+    }, 5000)
+  })
+
+  bot.on('chat', (username, message) => {
+    if (username === bot.username) return
+    if (message.toLowerCase() === 'hi') {
+      bot.chat('hlo')
+    }
+  })
+
+  bot.on('end', () => {
+    console.log('Bot disconnected. Reconnecting in 5s...')
+    clearInterval(jumpInterval)
+    if (shouldReconnect) {
+      setTimeout(startBot, 5000)
+    }
+  })
+
+  bot.on('error', (err) => {
+    console.error('Bot error:', err)
+  })
+}
+
+// === Telegram Bot ===
+
+telegramBot = new TelegramBot(TELEGRAM_TOKEN, { polling: true })
+
+telegramBot.onText(/\/status/, (msg) => {
+  telegramBot.sendMessage(msg.chat.id, `Bot online: ${!!bot?.player?.username}`)
+})
+
+telegramBot.onText(/\/say (.+)/, (msg, match) => {
+  const chatMsg = match[1]
+  if (bot) bot.chat(chatMsg)
+})
+
+telegramBot.onText(/\/jump/, (msg) => {
+  if (bot?.entity?.onGround) {
+    bot.setControlState('jump', true)
+    setTimeout(() => bot.setControlState('jump', false), 500)
+  }
+})
+
+telegramBot.onText(/\/stop/, (msg) => {
+  shouldReconnect = false
+  if (bot) bot.quit()
+  telegramBot.sendMessage(msg.chat.id, 'Bot stopped.')
+})
+
+// Start
+startBot()        setTimeout(() => mcBot.setControlState('jump', false), 300);
       }
     }, 5000);
   });

@@ -1,12 +1,12 @@
 import mineflayer from 'mineflayer';
-import { pathfinder, Movements, goals } from 'mineflayer-pathfinder';
+import { pathfinder } from 'mineflayer-pathfinder';
 import TelegramBot from 'node-telegram-bot-api';
 
 const botUsername = 'GOD_GAMERZ_XD';
 const serverHost = 'mcfleet.net';
 const telegramToken = '8015321777:AAFbGRO25iV4Vv_89BrLFfHlzUogn9-6kv0';
-const telegramBot = new TelegramBot(telegramToken, { polling: true });
 
+const tgBot = new TelegramBot(telegramToken, { polling: true });
 let bot;
 
 function createBot() {
@@ -23,46 +23,48 @@ function createBot() {
     bot.chat('/login GODGAMERZ9998');
     setTimeout(() => bot.chat('/joinq survival-2'), 4000);
     setTimeout(() => bot.chat('/warp AfkZone'), 8000);
-    jumpLoop();
+    setInterval(() => {
+      if (bot.entity && bot.entity.onGround) {
+        bot.setControlState('jump', true);
+        setTimeout(() => bot.setControlState('jump', false), 200);
+      }
+    }, 5000);
   });
 
   bot.on('chat', (username, message) => {
-    if (username === bot.username) return;
-    if (message.toLowerCase() === 'hi') {
+    if (username !== bot.username && message.toLowerCase() === 'hi') {
       bot.chat('hlo');
     }
   });
 
   bot.on('end', () => {
-    console.log('Bot disconnected. Reconnecting in 5s...');
+    console.log('Bot disconnected. Reconnecting...');
     setTimeout(createBot, 5000);
   });
 
-  bot.on('error', (err) => {
-    console.error('Bot error:', err);
-  });
+  bot.on('error', console.error);
 }
 
-function jumpLoop() {
-  setInterval(() => {
-    if (bot && bot.entity && bot.entity.onGround) {
-      bot.setControlState('jump', true);
-      setTimeout(() => bot.setControlState('jump', false), 200);
-    }
-  }, 5000);
-}
-
-// Telegram commands
-telegramBot.onText(/\/status/, (msg) => {
-  telegramBot.sendMessage(msg.chat.id, `Bot status: ${bot ? 'Online ✅' : 'Offline ❌'}`);
+tgBot.onText(/\/status/, (msg) => {
+  tgBot.sendMessage(msg.chat.id, bot ? '✅ Bot is online' : '❌ Bot is offline');
 });
 
-telegramBot.onText(/\/say (.+)/, (msg, match) => {
-  const message = match[1];
-  if (bot) bot.chat(message);
+tgBot.onText(/\/say (.+)/, (msg, match) => {
+  if (bot) bot.chat(match[1]);
 });
 
-telegramBot.onText(/\/jump/, (msg) => {
+tgBot.onText(/\/jump/, (msg) => {
+  if (bot) {
+    bot.setControlState('jump', true);
+    setTimeout(() => bot.setControlState('jump', false), 300);
+  }
+});
+
+tgBot.onText(/\/stop/, (msg) => {
+  process.exit(0);
+});
+
+createBot();telegramBot.onText(/\/jump/, (msg) => {
   if (bot) {
     bot.setControlState('jump', true);
     setTimeout(() => bot.setControlState('jump', false), 300);

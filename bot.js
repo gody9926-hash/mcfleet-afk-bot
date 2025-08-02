@@ -15,7 +15,7 @@ function startBot() {
   bot = mineflayer.createBot({
     host: serverHost,
     username: botUsername,
-    version: '1.21.4',
+    version: '1.20.1',
     auth: 'offline',
   });
 

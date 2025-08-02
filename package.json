@@ -1,8 +1,8 @@
 {
   "name": "mcfleet-afk-bot",
   "version": "1.0.0",
-  "type": "module",
   "main": "bot.js",
+  "type": "module",
   "scripts": {
     "start": "node bot.js"
   },
@@ -12,7 +12,6 @@
   "dependencies": {
     "mineflayer": "^4.11.1",
     "mineflayer-pathfinder": "^1.6.1",
-    "mineflayer-auto-reconnect-plugin": "^1.1.2",
     "node-telegram-bot-api": "^0.61.0"
   }
 }

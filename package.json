@@ -2,11 +2,16 @@
   "name": "mcfleet-afk-bot",
   "version": "1.0.0",
   "main": "bot.js",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "node bot.js"
   },
   "dependencies": {
-    "mineflayer": "^4.11.1",
+    "axios": "^1.6.8",
+    "mineflayer": "^4.30.0",
     "node-telegram-bot-api": "^0.61.0"
   }
 }

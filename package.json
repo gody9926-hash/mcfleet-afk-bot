@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "main": "bot.js",
-  "engines": {
-    "node": "18.x"
-  },
   "scripts": {
     "start": "node bot.js"
   },
+  "engines": {
+    "node": "18.x"
+  },
   "dependencies": {
     "mineflayer": "^4.5.0",
-    "node-fetch": "^2.6.1",
-    "telegraf": "^4.12.2"
+    "telegraf": "^4.12.2",
+    "node-fetch": "^2.6.1"
   }
 }

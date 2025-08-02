@@ -1,12 +1,19 @@
 {
-  "name": "afk-bot-esm",
+  "name": "mcfleet-afk-bot",
   "version": "1.0.0",
+  "description": "AFK Bot for Minecraft 1.20.1 with Telegram control",
+  "main": "bot.js",
   "type": "module",
-  "main": "bot.mjs",
   "scripts": {
-    "start": "node bot.mjs"
+    "start": "node bot.js"
+  },
+  "engines": {
+    "node": "18.x"
   },
   "dependencies": {
-    "mineflayer": "^5.1.0"
+    "mineflayer": "^4.12.0",
+    "mineflayer-pathfinder": "^1.5.0",
+    "mineflayer-auto-reconnect": "^1.1.0",
+    "node-telegram-bot-api": "^0.61.0"
   }
 }

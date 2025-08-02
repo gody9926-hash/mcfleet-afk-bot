@@ -4,7 +4,7 @@ const TelegramBot = require('node-telegram-bot-api')
 const bot = mineflayer.createBot({
   host: 'mcfleet.net',
   username: 'GOD_GAMERZ_XD',
-  version: '1.20.1',
+  version: '1.21.4',
   auth: 'offline',
 })
 

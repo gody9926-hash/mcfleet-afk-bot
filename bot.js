@@ -1,40 +1,53 @@
 const mineflayer = require('mineflayer');
-const { Telegraf } = require('telegraf');
+const { pathfinder } = require('mineflayer-pathfinder');
+const TelegramBot = require('node-telegram-bot-api');
 
-const botToken = '8015321777:AAFbGRO25iV4Vv_89BrLFfHlzUogn9-6kv0';
-const telegramBot = new Telegraf(botToken);
+const bot = mineflayer.createBot({
+  host: 'mcfleet.net',
+  port: 25565,
+  username: 'GOD_GAMERZ_XD',
+  version: '1.20.1',
+});
 
-let mcBot;
+bot.loadPlugin(pathfinder);
 
-function createBot() {
-  mcBot = mineflayer.createBot({
-    host: 'mcfleet.net',
-    port: 25565,
-    username: 'GOD_GAMERZ_XD',
-    version: '1.20.1',
-    auth: 'offline',
-  });
+bot.on('login', () => {
+  console.log('✅ Minecraft Bot logged in!');
+  bot.chat('/login GODGAMERZ9998');
+});
 
-  mcBot.on('login', () => {
-    console.log('✅ Minecraft bot logged in');
-    setTimeout(() => mcBot.chat('/login GODGAMERZ9998'), 3000);
-    setTimeout(() => mcBot.chat('/joinq survival-2'), 8000);
-    setTimeout(() => mcBot.chat('/warp AfkZone'), 12000);
-  });
+bot.once('spawn', () => {
+  bot.chat('/joinq survival-2');
+  setTimeout(() => {
+    bot.chat('/warp AfkZone');
+  }, 5000);
+});
 
-  mcBot.on('chat', (username, message) => {
-    if (username === mcBot.username) return;
-    if (message.toLowerCase() === 'hi') {
-      mcBot.chat('hlo');
-    }
-  });
+// Telegram Bot
+const tgBot = new TelegramBot('8015321777:AAFbGRO25iV4Vv_89BrLFfHlzUogn9-6kv0', { polling: true });
 
-  mcBot.on('end', () => {
-    console.log('🔁 Bot disconnected. Reconnecting in 5s...');
-    setTimeout(createBot, 5000);
-  });
+tgBot.onText(/\/status/, (msg) => {
+  tgBot.sendMessage(msg.chat.id, '🟢 Bot is running.');
+});
 
-  mcBot.on('error', err => {
+tgBot.onText(/\/say (.+)/, (msg, match) => {
+  const text = match[1];
+  bot.chat(text);
+  tgBot.sendMessage(msg.chat.id, `💬 Sent to Minecraft: ${text}`);
+});
+
+tgBot.onText(/\/stop/, (msg) => {
+  tgBot.sendMessage(msg.chat.id, '🛑 Stopping bot...');
+  process.exit();
+});
+
+// Auto reconnect
+bot.on('end', () => {
+  console.log('🔁 Bot disconnected. Reconnecting in 5s...');
+  setTimeout(() => {
+    require('./bot.js');
+  }, 5000);
+});  mcBot.on('error', err => {
     console.error('❌ Bot error:', err);
   });
 }

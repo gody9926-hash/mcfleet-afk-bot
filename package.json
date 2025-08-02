@@ -1,0 +1,16 @@
+{
+  "name": "mcfleet-afk-bot",
+  "version": "1.0.0",
+  "description": "Minecraft AFK Bot with Telegram integration for Render",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "mineflayer": "^4.17.1",
+    "node-telegram-bot-api": "^0.61.0"
+  }
+}

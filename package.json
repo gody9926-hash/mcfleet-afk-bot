@@ -1,15 +1,15 @@
 {
   "name": "mcfleet-afk-bot",
   "version": "1.0.0",
-  "description": "AFK bot for Minecraft using mineflayer",
+  "description": "Minecraft AFK Bot with Telegram Control for mcfleet.net",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js"
   },
   "engines": {
-  "node": "18.x"
-},
-"scripts": {
-  "start": "node bot.js"
-}
-}
+    "node": "18.x"
+  },
+  "dependencies": {
+    "mineflayer": "^4.5.0",
+    "mineflayer-pathfinder": "^1.0.0",
+    "node-telegram-bot-api": "^0.61.0",

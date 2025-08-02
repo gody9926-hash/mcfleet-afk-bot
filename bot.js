@@ -1,22 +1,24 @@
-import mineflayer from 'mineflayer';
-import { pathfinder } from 'mineflayer-pathfinder';
-import autoeat from 'mineflayer-auto-eat';
-import repl from 'repl';
+const mineflayer = require('mineflayer');
+const { pathfinder } = require('mineflayer-pathfinder');
 
-function createBot() {
-  const bot = mineflayer.createBot({
+let bot;
+let reconnectDelay = 10000;
+
+function startBot() {
+  console.log("Starting bot...");
+
+  bot = mineflayer.createBot({
     host: 'mcfleet.net',
-    port: 25565,
     username: 'GOD_GAMERZ_XD',
     version: '1.20.1',
-    auth: 'offline',
+    auth: 'offline'
   });
 
   bot.loadPlugin(pathfinder);
-  bot.loadPlugin(autoeat);
 
   bot.once('spawn', () => {
-    console.log('Bot spawned in the server.');
+    reconnectDelay = 10000; // Reset delay after successful connect
+    console.log("Bot spawned successfully!");
 
     bot.chat('/login GODGAMERZ9998');
 
@@ -30,8 +32,8 @@ function createBot() {
 
     setInterval(() => {
       bot.setControlState('jump', true);
-      setTimeout(() => bot.setControlState('jump', false), 500);
-    }, 10000);
+      setTimeout(() => bot.setControlState('jump', false), 300);
+    }, 15000);
   });
 
   bot.on('chat', (username, message) => {
@@ -41,22 +43,31 @@ function createBot() {
     }
   });
 
-  bot.on('end', () => {
-    console.log('Bot disconnected, reconnecting in 10s...');
-    setTimeout(createBot, 10000);
-  });
-
   bot.on('error', (err) => {
-    console.error('Bot error:', err.message);
+    console.error('Bot error:', err.code || err.message);
+
+    if (err.code === 'ECONNRESET') {
+      console.log('Connection reset by server. Reconnecting in 10s...');
+      bot.quit();
+      setTimeout(startBot, 10000);
+    }
   });
 
-  repl.start({ prompt: '> ', eval: (cmd, context, filename, callback) => {
-    try {
-      callback(null, eval(cmd));
-    } catch (e) {
-      callback(e);
-    }
-  }});
+  bot.on('end', () => {
+    console.log(`Bot disconnected. Reconnecting in ${reconnectDelay / 1000}s...`);
+    setTimeout(startBot, reconnectDelay);
+    reconnectDelay = Math.min(reconnectDelay * 2, 60000); // cap delay at 60s
+  });
+
+  process.on('unhandledRejection', (reason) => {
+    console.error('Unhandled rejection:', reason);
+  });
+
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught exception:', err);
+    console.log('Restarting bot in 10s...');
+    setTimeout(startBot, 10000);
+  });
 }
 
-createBot();
+startBot();

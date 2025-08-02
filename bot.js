@@ -2,57 +2,60 @@ const mineflayer = require('mineflayer');
 const { pathfinder } = require('mineflayer-pathfinder');
 const TelegramBot = require('node-telegram-bot-api');
 
-const telegramToken = '8015321777:AAFbGRO25iV4Vv_89BrLFfHlzUogn9-6kv0';
-const chatId = '@mcfleet_afk_bot'; // Or use your own ID if you're testing
+const bot = mineflayer.createBot({
+  host: 'mcfleet.net',
+  port: 25565,
+  username: 'GOD_GAMERZ_XD',
+  version: '1.20.1',
+});
 
-let bot;
-let reconnectTimeout;
+bot.loadPlugin(pathfinder);
 
-function createBot() {
-  bot = mineflayer.createBot({
-    host: 'mcfleet.net',
-    port: 25565,
-    username: 'GOD_GAMERZ_XD',
-    version: '1.20.1',
-    auth: 'offline',
-  });
+// Auto-login and join survival
+bot.once('spawn', () => {
+  console.log('✅ Bot spawned in Minecraft!');
+  bot.chat('/login GODGAMERZ9998');
+  setTimeout(() => bot.chat('/joinq survival-2'), 5000);
+  setTimeout(() => bot.chat('/warp AfkZone'), 8000);
+});
 
-  bot.on('login', () => {
-    console.log('✅ Logged in!');
-    bot.chat('/login GODGAMERZ9998');
-    setTimeout(() => bot.chat('/joinq survival-2'), 3000);
-    setTimeout(() => bot.chat('/warp AfkZone'), 6000);
-  });
+// Reconnect on disconnect
+bot.on('end', () => {
+  console.log('🔁 Bot disconnected. Reconnecting in 5s...');
+  setTimeout(() => process.exit(), 5000);
+});
 
-  bot.on('spawn', () => {
-    console.log('🚀 Bot spawned!');
+// Minecraft chat auto-reply
+bot.on('chat', (username, message) => {
+  if (username === bot.username) return;
+  if (message.toLowerCase() === 'hi') {
+    bot.chat('hlo');
+  }
+});
 
-    setInterval(() => {
-      if (bot.entity && bot.entity.onGround) {
-        bot.setControlState('jump', true);
-        setTimeout(() => bot.setControlState('jump', false), 200);
-      }
-    }, 5000);
-  });
+// === Telegram Bot Integration ===
+const telegramBot = new TelegramBot('8015321777:AAFbGRO25iV4Vv_89BrLFfHlzUogn9-6kv0', { polling: true });
 
-  bot.on('chat', (username, message) => {
-    if (username === bot.username) return;
-    if (message.toLowerCase() === 'hi') bot.chat('hlo');
-  });
+telegramBot.onText(/\/status/, msg => {
+  telegramBot.sendMessage(msg.chat.id, '🤖 Minecraft bot is online.');
+});
 
-  bot.on('end', () => {
-    console.log('🔁 Bot disconnected. Reconnecting in 5s...');
-    clearTimeout(reconnectTimeout);
-    reconnectTimeout = setTimeout(createBot, 5000);
-  });
+telegramBot.onText(/\/say (.+)/, (msg, match) => {
+  const text = match[1];
+  bot.chat(text);
+  telegramBot.sendMessage(msg.chat.id, `✅ Sent: ${text}`);
+});
 
-  bot.on('error', err => {
-    console.log('❌ Error:', err.message);
-  });
+telegramBot.onText(/\/stop/, msg => {
+  telegramBot.sendMessage(msg.chat.id, '🛑 Shutting down bot...');
+  bot.quit();
+  process.exit();
+});
 
-  // Load plugins
-  try {
-    bot.loadPlugin(pathfinder);
+telegramBot.onText(/\/warp/, msg => {
+  bot.chat('/warp AfkZone');
+  telegramBot.sendMessage(msg.chat.id, '📦 Teleported to /warp AfkZone.');
+});    bot.loadPlugin(pathfinder);
   } catch (e) {
     console.log('❌ Pathfinder plugin error:', e.message);
   }

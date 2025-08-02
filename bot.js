@@ -16,7 +16,7 @@ function startBot() {
     host: 'mcfleet.net',
     port: 25565,
     username: 'GOD_GAMERZ_XD',
-    version: '1.21.4',
+    version: '1.20.1',
     auth: 'offline',
   })
 

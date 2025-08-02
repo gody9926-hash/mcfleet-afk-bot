@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: mcfleet-afk-bot
+    env: node
+    buildCommand: yarn install
+    startCommand: node bot.js
+    build:
+      nodeVersion: 18

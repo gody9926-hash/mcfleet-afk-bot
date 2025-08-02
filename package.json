@@ -1,17 +1,12 @@
 {
   "name": "mcfleet-afk-bot",
   "version": "1.0.0",
-  "description": "AFK bot for Minecraft server with Telegram integration",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js"
   },
   "dependencies": {
-    "mineflayer": "^4.11.1",
-    "node-fetch": "^2.6.7",
+    "mineflayer": "4.11.1",
     "telegraf": "^4.12.2"
-  },
-  "engines": {
-    "node": ">=18.0.0"
   }
 }

@@ -1,15 +1,10 @@
 {
-  "name": "mcfleet-afk-bot",
+  "name": "minecraft-afk-bot",
   "version": "1.0.0",
-  "description": "Minecraft AFK Bot for mcfleet.net",
   "main": "bot.js",
-  "scripts": {
-    "start": "node bot.js"
-  },
   "dependencies": {
-    "mineflayer": "^4.16.1"
-  },
-  "engines": {
-    "node": "18.x"
+    "mineflayer": "^4.11.1",
+    "mineflayer-pathfinder": "^2.6.1",
+    "mineflayer-auto-eat": "^1.3.0"
   }
 }

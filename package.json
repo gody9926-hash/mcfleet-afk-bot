@@ -7,9 +7,9 @@
     "start": "node bot.js"
   },
   "engines": {
-    "node": "18.x"
-  },
-  "dependencies": {
-    "mineflayer": "^4.7.1"
-  }
+  "node": "18.x"
+},
+"scripts": {
+  "start": "node bot.js"
+}
 }

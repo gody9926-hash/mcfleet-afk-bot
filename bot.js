@@ -1,40 +1,81 @@
-import mineflayer from 'mineflayer'
-import { pathfinder } from 'mineflayer-pathfinder'
-import TelegramBot from 'node-telegram-bot-api'
-import readline from 'readline'
+import mineflayer from 'mineflayer';
+import { pathfinder, Movements, goals } from 'mineflayer-pathfinder';
+import TelegramBot from 'node-telegram-bot-api';
 
-// Replace with your bot token
-const TELEGRAM_TOKEN = '8015321777:AAFbGRO25iV4Vv_89BrLFfHlzUogn9-6kv0'
-const CHAT_ID = 'your-telegram-chat-id' // Set this after first run from logs
+const botUsername = 'GOD_GAMERZ_XD';
+const serverHost = 'mcfleet.net';
+const telegramToken = '8015321777:AAFbGRO25iV4Vv_89BrLFfHlzUogn9-6kv0';
+const telegramBot = new TelegramBot(telegramToken, { polling: true });
 
-let bot, telegramBot
-let shouldReconnect = true
-let jumpInterval
+let bot;
 
-function startBot() {
+function createBot() {
   bot = mineflayer.createBot({
-    host: 'mcfleet.net',
-    port: 25565,
-    username: 'GOD_GAMERZ_XD',
-    version: '1.20.1',
-    auth: 'offline',
-  })
+    host: serverHost,
+    username: botUsername,
+    version: '1.21.4',
+    offline: true,
+  });
 
-  bot.loadPlugin(pathfinder)
+  bot.loadPlugin(pathfinder);
 
   bot.once('spawn', () => {
-    console.log('Bot spawned')
+    bot.chat('/login GODGAMERZ9998');
+    setTimeout(() => bot.chat('/joinq survival-2'), 4000);
+    setTimeout(() => bot.chat('/warp AfkZone'), 8000);
+    jumpLoop();
+  });
 
-    bot.chat('/login GODGAMERZ9998')
-    setTimeout(() => bot.chat('/joinq survival-2'), 3000)
-    setTimeout(() => bot.chat('/warp AfkZone'), 6000)
+  bot.on('chat', (username, message) => {
+    if (username === bot.username) return;
+    if (message.toLowerCase() === 'hi') {
+      bot.chat('hlo');
+    }
+  });
 
-    // Auto-jump
-    jumpInterval = setInterval(() => {
-      if (bot.entity && bot.entity.onGround) {
-        bot.setControlState('jump', true)
-        setTimeout(() => bot.setControlState('jump', false), 200)
-      }
+  bot.on('end', () => {
+    console.log('Bot disconnected. Reconnecting in 5s...');
+    setTimeout(createBot, 5000);
+  });
+
+  bot.on('error', (err) => {
+    console.error('Bot error:', err);
+  });
+}
+
+function jumpLoop() {
+  setInterval(() => {
+    if (bot && bot.entity && bot.entity.onGround) {
+      bot.setControlState('jump', true);
+      setTimeout(() => bot.setControlState('jump', false), 200);
+    }
+  }, 5000);
+}
+
+// Telegram commands
+telegramBot.onText(/\/status/, (msg) => {
+  telegramBot.sendMessage(msg.chat.id, `Bot status: ${bot ? 'Online ✅' : 'Offline ❌'}`);
+});
+
+telegramBot.onText(/\/say (.+)/, (msg, match) => {
+  const message = match[1];
+  if (bot) bot.chat(message);
+});
+
+telegramBot.onText(/\/jump/, (msg) => {
+  if (bot) {
+    bot.setControlState('jump', true);
+    setTimeout(() => bot.setControlState('jump', false), 300);
+    telegramBot.sendMessage(msg.chat.id, 'Jumped ⬆️');
+  }
+});
+
+telegramBot.onText(/\/stop/, (msg) => {
+  telegramBot.sendMessage(msg.chat.id, 'Bot stopped.');
+  process.exit(0);
+});
+
+createBot();      }
     }, 5000)
   })
 

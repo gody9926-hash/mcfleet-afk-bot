@@ -1,13 +1,15 @@
 {
   "name": "mcfleet-afk-bot",
   "version": "1.0.0",
-  "engines": {
-    "node": "18.x"
-  },
+  "description": "AFK bot for mcfleet",
+  "main": "bot.js",
   "scripts": {
     "start": "node bot.js"
   },
+  "engines": {
+    "node": "18.x"
+  },
   "dependencies": {
-    "mineflayer": "^5.1.0"
+    "mineflayer": "^4.10.0"
   }
 }

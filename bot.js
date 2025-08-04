@@ -10,8 +10,14 @@ function createBot() {
   });
 
   bot.once('spawn', () => {
-    console.log('Bot spawned!');
+  console.log('Bot spawned!');
+  setTimeout(() => {
     bot.chat('/login GODGAMERZ9998');
+    setTimeout(() => {
+      bot.chat('/joinq survival-2');
+    }, 5000);
+  }, 5000);
+});
 
     setTimeout(() => {
       bot.chat('/joinq survival-2');

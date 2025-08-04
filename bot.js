@@ -14,15 +14,14 @@ function createBot() {
   });
 
   bot.once('spawn', () => {
-    console.log('Bot spawned!');
-    // Delay to prevent ECONNRESET from spamming too early
+  console.log('Bot spawned!');
+  setTimeout(() => {
+    bot.chat('/login GODGAMERZ9998');
     setTimeout(() => {
-      bot.chat('/login GODGAMERZ9998');
-      setTimeout(() => {
-        bot.chat('/joinq survival-2');
-      }, 5000);
-    }, 5000);
-  });
+      bot.chat('/joinq survival-2');
+    }, 10000); // 10s wait before /joinq
+  }, 10000); // 10s wait before /login
+});
 
   bot.on('error', (err) => {
     console.log('Bot error:', err.code || err);
